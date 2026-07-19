@@ -288,7 +288,11 @@ This worked fine in the early 2000s when a "busy" server had a few hundred concu
 
 The answer with threads was: you can't. Here's why:
 
-An OS thread on Linux has a **default stack size of 8MB** (adjustable but with limits). Just the stack memory for 10,000 threads is 80GB. Even if you reduce the default stack to 1MB, you're at 10GB — likely more than your machine's RAM. And that's ignoring the massive overhead of OS-level context switches, which involve saving and restoring full CPU register state in kernel mode at a cost of ~1–5µs each.
+An OS thread on Linux has a **default stack size of 8MB** (adjustable but with limits). Just the stack memory for 10,000 threads is 80GB. Even if you reduce the default stack to 1MB, you're at 10GB. 
+
+*(Note: While 10GB of RAM is very little today, remember the "C10K problem" was coined in 1999 when a server might only have 512MB of RAM. Today, the benchmark is the **C10M problem** (10 Million connections). With OS threads, that would be 10 Terabytes of RAM. With Goroutines at 2KB each, it is only 20 Gigabytes).*
+
+And that's ignoring the massive overhead of OS-level context switches, which involve saving and restoring full CPU register state in kernel mode at a cost of ~1–5µs each.
 
 The industry tried various workarounds: event loops (Node.js), callback hell, async/await, non-blocking I/O with `epoll`/`kqueue`. These work but make code complex and harder to reason about. You lose the natural sequential flow of "read, then process, then write."
 
